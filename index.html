@@ -4,29 +4,39 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="theme-color" content="#F59E0B" />
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="/pwa-192x192.png">
     <title>The Miwa - Pesan Dulu Jemput Nanti</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
     <script>
       tailwind.config = {
         theme: {
           extend: {
             fontFamily: { sans: ['Poppins', 'sans-serif'] },
             colors: {
-               amber: { 500: '#F59E0B', 600: '#D97706' }, // Warna Teh
-               emerald: { 600: '#059669' } // Warna WA
+               amber: { 500: '#F59E0B', 600: '#D97706' },
+               emerald: { 600: '#059669' }
+            },
+            animation: {
+              marquee: 'marquee 15s linear infinite',
+            },
+            keyframes: {
+              marquee: {
+                '0%': { transform: 'translateX(0)' },
+                '100%': { transform: 'translateX(-100%)' },
+              }
             }
           }
         }
       }
     </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   </head>
-  <body class="bg-gray-50 text-gray-800">
+  <body class="bg-gray-50 text-gray-800 antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
