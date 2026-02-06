@@ -114,7 +114,7 @@ function App() {
     setIsCartOpen(false);
     
     // Buka WhatsApp
-    window.open(`https://wa.me/6281234567890?text=${message}`, '_blank');
+    window.open(`https://wa.me/6282287686071?text=${message}`, '_blank');
   };
 
   // --- RENDER ---
