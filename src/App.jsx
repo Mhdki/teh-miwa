@@ -1,12 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import "./App.css";
 
 const menus = [
-  { id: 1, name: "Teh Original", price: 5000, category: "Original", img: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=300", desc: "Kesegaran daun teh asli." },
-  { id: 2, name: "Teh Lemon", price: 7000, category: "Fruit Series", img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300", desc: "Asam seger lemon pilihan." },
-  { id: 3, name: "Teh Susu", price: 8000, category: "Milk Series", img: "https://images.unsplash.com/photo-1571328003758-4a392120563d?w=300", desc: "Creamy susu ketemu teh." },
-  { id: 4, name: "Teh Yakult", price: 10000, category: "Fruit Series", img: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=300", desc: "Sehat, seger, bikin nagih." },
-  { id: 5, name: "Leci Tea", price: 12000, category: "Fruit Series", img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300", desc: "Ada buah leci aslinya!" },
+  { id: 1, name: "Teh Original", price: 5000, category: "Original", img: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=300", desc: "Kesegaran daun teh pegunungan asli." },
+  { id: 2, name: "Teh Lemon", price: 7000, category: "Fruit Series", img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300", desc: "Asam seger lemon pilihan, auto melek!" },
+  { id: 3, name: "Teh Susu", price: 8000, category: "Milk Series", img: "https://images.unsplash.com/photo-1571328003758-4a392120563d?w=300", desc: "Creamy susu ketemu teh, perpaduan maut." },
+  { id: 4, name: "Teh Yakult", price: 10000, category: "Fruit Series", img: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=300", desc: "Sehat, seger, dan bikin nagih terus." },
+  { id: 5, name: "Leci Tea", price: 12000, category: "Fruit Series", img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300", desc: "Ada buah leci aslinya di dalam!" },
+];
+
+const quotes = [
+  "Hidup itu kayak teh, pahit manisnya gimana lu nyeduhnya.",
+  "Haus itu manusiawi, tapi beli Miwa itu solusi hakiki.",
+  "Kerja terus kapan minumnya? Rehat sejenak bareng Miwa.",
+  "Jangan lupa bersyukur, hari ini lu masih bisa minum enak."
 ];
 
 export default function App() {
@@ -16,10 +23,13 @@ export default function App() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [name, setName] = useState("");
   const [note, setNote] = useState("");
+  const [quoteIndex, setQuoteIndex] = useState(0);
 
   useEffect(() => {
     localStorage.removeItem("miwaCart");
     setTimeout(() => setShowSplash(false), 2500);
+    const interval = setInterval(() => setQuoteIndex(p => (p + 1) % quotes.length), 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const addToCart = (m) => {
@@ -35,106 +45,126 @@ export default function App() {
   };
 
   const totalPrice = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+  const totalQty = cart.reduce((acc, item) => acc + item.qty, 0);
 
   const sendOrder = () => {
-    if (!name) return alert("Nama jangan kosong ya!");
+    if (!name) return alert("Pake nama siapa nih, cukk? 🙏");
     
-    // DETAIL ITEM BUAT WHATSAPP
-    const list = cart.map((i, idx) => `${idx + 1}. *${i.name}* (${i.qty}x)`).join('%0A');
+    const listOrder = cart.map((i, idx) => `${idx + 1}. *${i.name}* (${i.qty}x) - Rp${(i.price * i.qty).toLocaleString()}`).join('%0A');
     
-    const text = `Halo Teh Miwa! 👋%0A%0A` +
-      `👤 *Nama:* ${name}%0A` +
-      `🛒 *Pesanan:*%0A${list}%0A%0A` +
-      `📝 *Catatan:* ${note || "Gak ada"}%0A%0A` +
-      `💰 *Total: Rp${totalPrice.toLocaleString()}*%0A%0A` +
-      `*Pesan Dulu - Jemput - Bayar di Booth!* 🚀`;
+    const message = `Halo Teh Miwa! 👋%0A%0ASaya mau pesan lewat Web nih:%0A` +
+      `👤 *Nama:* ${name}%0A%0A` +
+      `🛒 *Pesanan:*%0A${listOrder}%0A%0A` +
+      `📝 *Catatan (Es/Gula):*%0A${note || "-"}%0A%0A` +
+      `💰 *Total Bayar: Rp${totalPrice.toLocaleString()}*%0A%0A` +
+      `*#PesanDuluJemputLaluBayar* 🚀%0A_Ditunggu tehnya ya!_`;
 
-    window.open(`https://wa.me/628123456789?text=${text}`, "_blank");
+    window.open(`https://wa.me/628123456789?text=${message}`, "_blank");
   };
 
-  const filtered = activeCat === "Semua" ? menus : menus.filter(m => m.category === activeCat);
+  const filtered = useMemo(() => activeCat === "Semua" ? menus : menus.filter(m => m.category === activeCat), [activeCat]);
 
   return (
-    <div className="container">
+    <div className="app-container">
       {showSplash && (
         <div className="splash">
-          <h1 className="splash-logo">🍃 Teh Miwa</h1>
-          <div className="loader"></div>
+          <div className="splash-box">
+            <span className="splash-icon">🍃</span>
+            <h1>Teh Miwa</h1>
+            <div className="loader"></div>
+          </div>
         </div>
       )}
 
-      <nav className="nav">
-        <strong>🍃 Teh Miwa</strong>
-        <span className="badge">Buka</span>
-      </nav>
+      <div className={`main-content ${!showSplash ? "fade-in" : ""}`}>
+        <nav className="top-nav">
+          <div className="brand">🍃 <span>Teh Miwa</span></div>
+          <div className="status">BOOTH OPEN</div>
+        </nav>
 
-      <header className="hero">
-        <p className="tagline">#PesanDuluJemputLaluBayar</p>
-        <h2>Gak Pake Antri,<br/><span>Langsung Sruput!</span></h2>
-        <div className="info-box">📍 Ambil & Bayar di Booth</div>
-      </header>
+        <header className="hero-section">
+          <p className="hero-tag">#PesanDuluJemputLaluBayar</p>
+          <h1>Haus? Jangan Antri,<br/><span className="highlight">Langsung Sruput!</span></h1>
+          <div className="booth-badge">📍 Booth: Jl. Raya Miwa No. 1</div>
+        </header>
 
-      <div className="cat-box">
-        {["Semua", "Original", "Milk Series", "Fruit Series"].map(c => (
-          <button key={c} onClick={() => setActiveCat(c)} className={activeCat === c ? "active" : ""}>{c}</button>
-        ))}
-      </div>
+        <div className="category-bar">
+          {["Semua", "Original", "Milk Series", "Fruit Series"].map(c => (
+            <button key={c} onClick={() => setActiveCat(c)} className={activeCat === c ? "active" : ""}>{c}</button>
+          ))}
+        </div>
 
-      <div className="menu-grid">
-        {filtered.map(m => (
-          <div key={m.id} className="card">
-            <img src={m.img} alt="" />
-            <div className="card-info">
-              <h3>{m.name}</h3>
-              <p>{m.desc}</p>
-              <div className="card-flex">
-                <strong>Rp{m.price.toLocaleString()}</strong>
-                <button onClick={() => addToCart(m)}>+</button>
+        <div className="menu-container">
+          {filtered.map((m, idx) => (
+            <div key={m.id} className="menu-card" style={{animationDelay: `${idx * 0.1}s`}}>
+              <div className="img-wrapper"><img src={m.img} alt="" /></div>
+              <div className="card-detail">
+                <h3>{m.name}</h3>
+                <p>{m.desc}</p>
+                <div className="price-row">
+                  <strong>Rp{m.price.toLocaleString()}</strong>
+                  <button onClick={() => addToCart(m)} className="add-btn">+</button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <footer className="main-footer">
+          <div className="quote-box">
+            <p key={quoteIndex} className="quote-anim">"{quotes[quoteIndex]}"</p>
+          </div>
+          <p className="copyright">© 2026 Teh Miwa • Segernya Masa Kini</p>
+        </footer>
+
+        {cart.length > 0 && !isCheckoutOpen && (
+          <div className="floating-cart" onClick={() => setIsCheckoutOpen(true)}>
+            <div className="cart-left">
+              <span className="count">{totalQty} Menu</span>
+              <span className="price">Rp{totalPrice.toLocaleString()}</span>
+            </div>
+            <span className="cta">Cek Out &rarr;</span>
+          </div>
+        )}
+
+        {isCheckoutOpen && (
+          <div className="modal-bg">
+            <div className="modal-sheet">
+              <div className="sheet-header">
+                <h3>Pesanan Lu</h3>
+                <button onClick={() => setIsCheckoutOpen(false)} className="close-x">✕</button>
+              </div>
+              
+              <div className="cart-list">
+                {cart.map(i => (
+                  <div key={i.id} className="cart-item">
+                    <div className="item-meta">
+                      <h4>{i.name}</h4>
+                      <span>Rp{(i.price * i.qty).toLocaleString()}</span>
+                    </div>
+                    <div className="item-qty">
+                      <button onClick={() => removeFromCart(i.id)}>−</button>
+                      <span>{i.qty}</span>
+                      <button onClick={() => addToCart(i)}>+</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="checkout-form">
+                <p className="note-alert">⚠️ Bayar di booth pas jemput tehnya ya!</p>
+                <input type="text" placeholder="Nama Lu Siapa?" value={name} onChange={e => setName(e.target.value)} />
+                <textarea 
+                  placeholder="Catatan (Contoh: Es dikit, Gula normal)" 
+                  value={note} 
+                  onChange={e => setNote(e.target.value)}
+                />
+                <button className="order-btn" onClick={sendOrder}>Kirim ke WhatsApp 🚀</button>
               </div>
             </div>
           </div>
-        ))}
+        )}
       </div>
-
-      <footer className="footer">
-        <p>"Haus itu manusiawi, tapi beli Miwa itu solusi hakiki."</p>
-        <small>© 2026 Teh Miwa Indonesia</small>
-      </footer>
-
-      {cart.length > 0 && !isCheckoutOpen && (
-        <div className="floating-bar" onClick={() => setIsCheckoutOpen(true)}>
-          <span>🛒 {cart.reduce((a, b) => a + b.qty, 0)} Item | Rp{totalPrice.toLocaleString()}</span>
-          <span>Cek Out &rarr;</span>
-        </div>
-      )}
-
-      {isCheckoutOpen && (
-        <div className="overlay">
-          <div className="sheet">
-            <div className="sheet-top">
-              <h3>Keranjang</h3>
-              <button onClick={() => setIsCheckoutOpen(false)}>✕</button>
-            </div>
-            <div className="sheet-list">
-              {cart.map(i => (
-                <div key={i.id} className="item-row">
-                  <div><h4>{i.name}</h4><small>Rp{i.price.toLocaleString()}</small></div>
-                  <div className="step">
-                    <button onClick={() => removeFromCart(i.id)}>−</button>
-                    <span>{i.qty}</span>
-                    <button onClick={() => addToCart(i)}>+</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="form">
-              <input type="text" placeholder="Nama Kamu?" value={name} onChange={e => setName(e.target.value)} />
-              <textarea placeholder="Catatan (Contoh: Kurang gula, es dikit)" value={note} onChange={e => setNote(e.target.value)} />
-              <button className="btn-wa" onClick={sendOrder}>Kirim ke WhatsApp 🚀</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
