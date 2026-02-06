@@ -2,9 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Animasi Muncul Perlahan (Fade In) */
+/* --- ANIMASI EXISTING --- */
 .animate-fade-in {
-  animation: fadeIn 0.6s ease-out forwards;
+  animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes fadeIn {
@@ -12,7 +12,6 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Animasi Modal Muncul dari Bawah (Slide Up) */
 .animate-slide-up {
   animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -22,17 +21,46 @@
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* Efek Tombol Memantul (Bounce) */
 .active-bounce:active {
   transform: scale(0.90);
   transition: transform 0.1s;
 }
 
-/* Scrollbar Sembunyi tapi Bisa Scroll */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* --- BARU: SPLASH SCREEN ANIMATION --- */
+.splash-bounce {
+  animation: splashBounce 2s infinite;
+}
+
+@keyframes splashBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.loading-bar {
+  animation: loadingProgress 2.5s ease-in-out forwards;
+}
+
+@keyframes loadingProgress {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+/* Efek Layar Terbuka (Curtain Effect) */
+.splash-exit {
+  animation: slideUpFade 0.8s ease-in-out forwards;
+}
+
+@keyframes slideUpFade {
+  to {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
 }
