@@ -23,26 +23,27 @@ const QUOTES = [
 ];
 
 function App() {
-  const [loading, setLoading] = useState(true); // State Loading Awal
+  const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('Semua');
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [quoteIndex, setQuoteIndex] = useState(0);
   
+  // State Form
   const [buyerName, setBuyerName] = useState('');
   const [pickupTime, setPickupTime] = useState('');
   const [buyerNote, setBuyerNote] = useState('');
 
-  // --- LOGIC ANIMASI SPLASH SCREEN ---
+  // State Peringatan Akhir (New Feature)
+  const [showWarning, setShowWarning] = useState(false);
+
+  // Splash Screen Logic
   useEffect(() => {
-    // Timer 2.5 Detik
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2500);
+    const timer = setTimeout(() => setLoading(false), 2500);
     return () => clearTimeout(timer);
   }, []);
 
-  // Animasi Quotes
+  // Quotes Logic
   useEffect(() => {
     const interval = setInterval(() => {
       setQuoteIndex((prev) => (prev + 1) % QUOTES.length);
@@ -83,11 +84,20 @@ function App() {
     ? MENU_ITEMS 
     : MENU_ITEMS.filter(item => item.category === activeCategory);
 
-  const handleCheckout = () => {
+  // --- LOGIC CHECKOUT BARU ---
+  
+  // Tahap 1: Validasi Input -> Buka Warning Modal
+  const handlePreCheckout = () => {
     if (!buyerName || !pickupTime || cart.length === 0) {
-      alert("Mohon isi Nama, Jam Jemput, dan pilih pesanan dulu ya!");
+      alert("Mohon isi Nama & Jam Jemput dulu ya, Kak!");
       return;
     }
+    // Jika data lengkap, tampilkan peringatan es cair
+    setShowWarning(true);
+  };
+
+  // Tahap 2: Kirim ke WhatsApp (Setelah Setuju)
+  const handleFinalCheckout = () => {
     let message = `Halo Kak, mau pesan *The Miwa* dong! 🥤%0A%0A`;
     message += `👤 Nama: *${buyerName}*%0A`;
     message += `⏰ Jam Jemput: *${pickupTime}*%0A`;
@@ -98,10 +108,16 @@ function App() {
     });
     message += `%0A💰 *Total: Rp ${totalAmount.toLocaleString('id-ID')}*%0A`;
     message += `%0A#pesandulujemputlalubayar`;
-    window.open(`https://wa.me/6282287686071?text=${message}`, '_blank');
+    
+    // Reset State
+    setShowWarning(false);
+    setIsCartOpen(false);
+    
+    // Buka WhatsApp
+    window.open(`https://wa.me/6281234567890?text=${message}`, '_blank');
   };
 
-  // --- TAMPILAN SPLASH SCREEN ---
+  // --- RENDER ---
   if (loading) {
     return (
       <div className="fixed inset-0 bg-amber-500 z-[9999] flex flex-col items-center justify-center text-white splash-exit-wrapper">
@@ -109,7 +125,6 @@ function App() {
           <h1 className="text-6xl font-extrabold tracking-tighter mb-2">miwa<span className="text-emerald-200">.</span></h1>
           <p className="text-amber-100 text-sm tracking-widest uppercase">Refresh Your Day</p>
         </div>
-        {/* Loading Bar */}
         <div className="w-48 h-1.5 bg-amber-700/30 rounded-full mt-8 overflow-hidden">
           <div className="h-full bg-white loading-bar rounded-full"></div>
         </div>
@@ -117,7 +132,6 @@ function App() {
     );
   }
 
-  // --- TAMPILAN UTAMA (Main App) ---
   return (
     <div className="min-h-screen pb-24 font-sans text-gray-800 bg-gray-50">
       
@@ -138,41 +152,21 @@ function App() {
 
       {/* Main Content */}
       <main className="max-w-md mx-auto pt-24 px-5 animate-fade-in">
-        
-        {/* Hero Section */}
         <div className="bg-gradient-to-r from-amber-400 to-amber-500 rounded-2xl p-6 mb-8 text-white relative overflow-hidden shadow-lg shadow-amber-200">
           <div className="relative z-10">
-            <span className="inline-block bg-white/20 backdrop-blur-sm border border-white/30 text-xs font-bold px-3 py-1 rounded-full mb-3">
-              #pesandulujemputlalubayar
-            </span>
-            <h2 className="text-3xl font-bold leading-tight mb-2 drop-shadow-md">
-              Pesan cepat, <br/> Tiba langsung <span className="text-amber-100 italic">sruput!</span>
-            </h2>
-            <p className="text-xs text-amber-50 mt-2 flex items-center gap-1 opacity-90">
-              ⚡ Pesanan dikerjakan saat tiba di booth
-            </p>
+            <span className="inline-block bg-white/20 backdrop-blur-sm border border-white/30 text-xs font-bold px-3 py-1 rounded-full mb-3">#pesandulujemputlalubayar</span>
+            <h2 className="text-3xl font-bold leading-tight mb-2 drop-shadow-md">Pesan cepat, <br/> Tiba langsung <span className="text-amber-100 italic">sruput!</span></h2>
+            <p className="text-xs text-amber-50 mt-2 flex items-center gap-1 opacity-90">⚡ Pesanan dikerjakan saat tiba di booth</p>
           </div>
           <div className="absolute -right-5 -bottom-10 text-[120px] opacity-20 rotate-12 select-none">🥤</div>
         </div>
 
-        {/* Filter Kategori */}
         <div className="flex gap-2 overflow-x-auto pb-4 mb-2 no-scrollbar">
           {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`whitespace-nowrap px-5 py-2 rounded-full text-xs font-bold transition-all active-bounce ${
-                activeCategory === cat 
-                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200' 
-                  : 'bg-white text-gray-400 border border-gray-100 hover:bg-gray-50'
-              }`}
-            >
-              {cat}
-            </button>
+            <button key={cat} onClick={() => setActiveCategory(cat)} className={`whitespace-nowrap px-5 py-2 rounded-full text-xs font-bold transition-all active-bounce ${activeCategory === cat ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200' : 'bg-white text-gray-400 border border-gray-100 hover:bg-gray-50'}`}>{cat}</button>
           ))}
         </div>
 
-        {/* Menu Catalog */}
         <div className="space-y-4 mb-10">
           {filteredMenu.map((item) => {
             const itemQty = getItemQty(item.id);
@@ -180,27 +174,14 @@ function App() {
               <div key={item.id} className={`group bg-white p-3 rounded-2xl border transition-all duration-300 flex items-center gap-4 hover:shadow-lg ${itemQty > 0 ? 'border-amber-400 ring-1 ring-amber-400 bg-amber-50/30' : 'border-gray-100 shadow-sm'}`}>
                 <div className="w-24 h-24 shrink-0 bg-gray-100 rounded-xl overflow-hidden relative">
                   <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                  {itemQty > 0 && (
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[2px] animate-fade-in">
-                      <span className="text-white font-extrabold text-2xl drop-shadow-md">{itemQty}x</span>
-                    </div>
-                  )}
+                  {itemQty > 0 && <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[2px] animate-fade-in"><span className="text-white font-extrabold text-2xl drop-shadow-md">{itemQty}x</span></div>}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-bold text-gray-800 text-sm leading-tight">{item.name}</h3>
                   <p className="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed">{item.desc}</p>
                   <div className="flex justify-between items-end mt-3">
                     <p className="text-amber-500 font-bold text-base">Rp {item.price.toLocaleString('id-ID')}</p>
-                    <button 
-                      onClick={() => addToCart(item)}
-                      className={`w-9 h-9 rounded-full flex items-center justify-center active-bounce transition-colors ${
-                        itemQty > 0 
-                        ? 'bg-emerald-500 text-white shadow-emerald-200 shadow-md' 
-                        : 'bg-amber-100 text-amber-600 hover:bg-amber-500 hover:text-white'
-                      }`}
-                    >
-                      <span className="font-bold text-xl">{itemQty > 0 ? '✎' : '+'}</span>
-                    </button>
+                    <button onClick={() => addToCart(item)} className={`w-9 h-9 rounded-full flex items-center justify-center active-bounce transition-colors ${itemQty > 0 ? 'bg-emerald-500 text-white shadow-emerald-200 shadow-md' : 'bg-amber-100 text-amber-600 hover:bg-amber-500 hover:text-white'}`}><span className="font-bold text-xl">{itemQty > 0 ? '✎' : '+'}</span></button>
                   </div>
                 </div>
               </div>
@@ -208,21 +189,18 @@ function App() {
           })}
         </div>
 
-        {/* Motivation Section */}
         <div className="bg-gray-800 text-white rounded-2xl p-6 text-center mb-24 relative overflow-hidden shadow-xl">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-emerald-400"></div>
           <p className="text-sm font-medium italic opacity-80 mb-2">Daily Reminder:</p>
           <p className="text-lg font-bold transition-all duration-500 animate-fade-in">"{QUOTES[quoteIndex]}"</p>
         </div>
-
       </main>
 
-      {/* Footer */}
       <footer className="text-center text-gray-300 text-[10px] py-6 pb-24 border-t border-gray-200/50 bg-white">
         <p>&copy; {new Date().getFullYear()} The Miwa.</p>
       </footer>
 
-      {/* Cart / Checkout Modal */}
+      {/* Cart Modal */}
       {isCartOpen && (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setIsCartOpen(false)}></div>
@@ -268,7 +246,8 @@ function App() {
                     <span className="text-gray-500 text-sm">Total Pembayaran</span>
                     <span className="text-2xl font-extrabold text-gray-800">Rp {totalAmount.toLocaleString('id-ID')}</span>
                   </div>
-                  <button onClick={handleCheckout} className="w-full bg-emerald-500 text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-emerald-200 active-bounce flex items-center justify-center gap-2 hover:bg-emerald-600 transition">
+                  {/* Tombol yang memicu Warning Modal */}
+                  <button onClick={handlePreCheckout} className="w-full bg-emerald-500 text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-emerald-200 active-bounce flex items-center justify-center gap-2 hover:bg-emerald-600 transition">
                     <span>Pesan Sekarang</span>
                   </button>
                 </div>
@@ -277,6 +256,42 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* --- FITUR BARU: WARNING MODAL (Z-Index Paling Tinggi) --- */}
+      {showWarning && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
+          {/* Backdrop Gelap */}
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-fade-in" onClick={() => setShowWarning(false)}></div>
+          
+          {/* Card Warning */}
+          <div className="bg-white w-full max-w-sm rounded-3xl p-6 relative z-20 text-center shadow-2xl animate-slide-up border-4 border-amber-100">
+            <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl animate-bounce">
+              ⚠️
+            </div>
+            <h3 className="text-xl font-extrabold text-gray-800 mb-2">Sebentar ya Kak!</h3>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6">
+              Agar <span className="font-bold text-amber-500">Es Tidak Cair</span> dan rasa tetap segar, pesanan baru akan kami buat 
+              <span className="font-bold text-gray-800"> SAAT KAKAK TIBA DI BOOTH</span> ya.
+            </p>
+            
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setShowWarning(false)}
+                className="flex-1 py-3 rounded-xl font-bold text-gray-500 bg-gray-100 hover:bg-gray-200 transition"
+              >
+                Batal
+              </button>
+              <button 
+                onClick={handleFinalCheckout}
+                className="flex-[2] py-3 rounded-xl font-bold text-white bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-200 transition active-bounce"
+              >
+                Siap, Mengerti!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
