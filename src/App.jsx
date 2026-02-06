@@ -14,19 +14,18 @@ const categories = ["Semua", "Original", "Milk Series", "Fruit Series"];
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [activeCat, setActiveCat] = useState("Semua");
-  const [cart, setCart] = useState([]); 
+  const [cart, setCart] = useState([]);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [name, setName] = useState("");
 
-  // Efek awal: Bersihkan sampah & tampilkan Splash Screen
   useEffect(() => {
     localStorage.removeItem("miwaCart");
     const timer = setTimeout(() => setShowSplash(false), 3000);
     return () => clearTimeout(timer);
   }, []);
 
-  const totalQty = cart.reduce((acc, item) => acc + item.qty, 0);
   const totalPrice = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+  const totalQty = cart.reduce((acc, item) => acc + item.qty, 0);
 
   const addToCart = (menu) => {
     setCart(prev => {
@@ -40,40 +39,17 @@ export default function App() {
     setCart(prev => prev.map(i => i.id === id ? { ...i, qty: i.qty - 1 } : i).filter(i => i.qty > 0));
   };
 
-  const clearCart = () => {
-    if(window.confirm("Kosongkan keranjang?")) {
-      setCart([]);
-      setIsCheckoutOpen(false);
-    }
-  };
-
-  // --- FUNGSI PESAN WHATSAPP (DETAIL LENGKAP) ---
   const sendOrder = () => {
-    if (!name) return alert("Isi nama dulu dong cukk! 🙏");
-
-    const itemDetails = cart.map((item, index) => {
-      return `${index + 1}. *${item.name}* (${item.qty}x) - Rp${(item.price * item.qty).toLocaleString('id-ID')}`;
-    }).join('%0A');
-
-    const message = `Halo Teh Miwa! 👋%0A%0A` +
-      `Saya mau pesan dong:%0A` +
-      `👤 *Nama:* ${name}%0A%0A` +
-      `🛒 *Pesanan:*%0A${itemDetails}%0A%0A` +
-      `💰 *Total Bayar: Rp${totalPrice.toLocaleString('id-ID')}*%0A%0A` +
-      `Info: Saya bayar di booth ya. Ditunggu! 🍃`;
-
-    const waNumber = "628123456789"; // GANTI DENGAN NOMOR WA LU
-
-    window.open(`https://wa.me/${waNumber}?text=${message}`, "_blank");
+    if (!name) return alert("Isi nama dulu cukk! 🙏");
+    const details = cart.map((i, index) => `${index + 1}. *${i.name}* (${i.qty}x)`).join('%0A');
+    const msg = `Halo Teh Miwa!%0A%0A👤 *Nama:* ${name}%0A🛒 *Pesanan:*%0A${details}%0A%0A💰 *Total: Rp${totalPrice.toLocaleString()}*%0A%0ADitunggu ya!`;
+    window.open(`https://wa.me/628123456789?text=${msg}`);
   };
 
-  const filteredMenus = useMemo(() => 
-    activeCat === "Semua" ? menus : menus.filter(m => m.category === activeCat)
-  , [activeCat]);
+  const filteredMenus = useMemo(() => activeCat === "Semua" ? menus : menus.filter(m => m.category === activeCat), [activeCat]);
 
   return (
     <div className="app-shell">
-      {/* 1. SPLASH SCREEN */}
       {showSplash && (
         <div className="splash-screen">
           <div className="splash-content">
@@ -85,23 +61,14 @@ export default function App() {
         </div>
       )}
 
-      {/* 2. MAIN LAYOUT */}
       <div className={`main-layout ${!showSplash ? 'show' : ''}`}>
         <nav className="navbar">
-          <div className="logo-wrap">
-            <span className="logo-icon">🍃</span>
-            <span className="logo-text">Teh Miwa</span>
-          </div>
+          <div className="logo-wrap"><span className="logo-text">Teh Miwa</span></div>
           <div className="status-badge">Booth Buka</div>
         </nav>
 
         <header className="hero">
-          <div className="hero-content">
-            <p className="hero-sub">#SegernyaMasaKini</p>
-            <h1>Haus? Ingat <br/><span className="miwa-highlight">Teh Miwa</span> Sruputnya!</h1>
-            <p className="hero-p">Racikan teh autentik yang bikin mood balik 100%. Pilih dan ambil di booth!</p>
-          </div>
-          <div className="hero-blob"></div>
+          <h1>Haus? Ingat <br/><span className="miwa-highlight">Teh Miwa</span> Sruputnya!</h1>
         </header>
 
         <main className="main-content">
@@ -112,8 +79,8 @@ export default function App() {
           </div>
 
           <div className="menu-list">
-            {filteredMenus.map((m, idx) => (
-              <div key={m.id} className="menu-card" style={{animationDelay: `${idx * 0.1}s`}}>
+            {filteredMenus.map(m => (
+              <div key={m.id} className="menu-card">
                 <div className="img-container"><img src={m.img} alt="" /></div>
                 <div className="card-body">
                   <h3>{m.name}</h3>
@@ -130,63 +97,43 @@ export default function App() {
 
         <footer className="footer">
           <div className="footer-line"></div>
-          <p>"Jangan lupa minum, biar gak dehidrasi kasih sayang."</p>
-          <small>© 2026 Teh Miwa Indonesia</small>
+          <p>© 2026 Teh Miwa Indonesia</p>
         </footer>
 
-        {/* 3. FLOATING CART */}
         {cart.length > 0 && !isCheckoutOpen && (
           <div className="float-action" onClick={() => setIsCheckoutOpen(true)}>
             <div className="cart-summary">
-              <div className="cart-icon-bg">🛒</div>
-              <div className="cart-info-text">
-                <span className="q-item">{totalQty} Item terpilih</span>
-                <span className="p-item">Rp{totalPrice.toLocaleString()}</span>
-              </div>
+              <span>🛒 {totalQty} Item</span>
+              <span className="p-item">Rp{totalPrice.toLocaleString()}</span>
             </div>
             <span className="order-now">Cek Out &rarr;</span>
           </div>
         )}
 
-        {/* 4. MODAL KERANJANG */}
         {isCheckoutOpen && (
           <div className="modal-backdrop">
             <div className="modal-sheet">
-              <div className="sheet-handle"></div>
               <div className="sheet-header">
-                <div className="title-stack">
-                  <h3>Pesanan Lu</h3>
-                  <p>Cek lagi rinciannya, cukk!</p>
-                </div>
-                <button className="trash-btn" onClick={clearCart}>🗑️ Hapus</button>
+                <h3>Keranjang</h3>
+                <button className="trash-btn" onClick={() => {setCart([]); setIsCheckoutOpen(false);}}>🗑️</button>
                 <button className="close-btn" onClick={() => setIsCheckoutOpen(false)}>✕</button>
               </div>
-              
-              <div className="item-scroll">
-                {cart.map(item => (
-                  <div key={item.id} className="cart-item">
-                    <img src={item.img} className="mini-thumb" alt="" />
-                    <div className="item-meta">
-                      <h4>{item.name}</h4>
-                      <p>Rp{item.price.toLocaleString()}</p>
-                    </div>
-                    <div className="stepper-modern">
-                      <button onClick={() => removeFromCart(item.id)}>−</button>
-                      <span>{item.qty}</span>
-                      <button onClick={() => addToCart(item)}>+</button>
-                    </div>
+              {cart.map(item => (
+                <div key={item.id} className="cart-item">
+                  <img src={item.img} className="mini-thumb" alt="" />
+                  <div className="item-meta">
+                    <h4>{item.name}</h4>
+                    <p>Rp{item.price.toLocaleString()}</p>
                   </div>
-                ))}
-              </div>
-
-              <div className="sheet-footer">
-                <div className="total-stack">
-                  <span>Total Bayar:</span>
-                  <span className="grand-total">Rp{totalPrice.toLocaleString()}</span>
+                  <div className="stepper-modern">
+                    <button onClick={() => removeFromCart(item.id)}>−</button>
+                    <span>{item.qty}</span>
+                    <button onClick={() => addToCart(item)}>+</button>
+                  </div>
                 </div>
-                <input type="text" placeholder="Pake nama siapa nih?" value={name} onChange={e => setName(e.target.value)} className="modern-input" />
-                <button className="wa-submit" onClick={sendOrder}>Gaskeun ke WhatsApp 🚀</button>
-              </div>
+              ))}
+              <input type="text" placeholder="Nama Lu..." value={name} onChange={e => setName(e.target.value)} className="modern-input" />
+              <button className="wa-submit" onClick={sendOrder}>Pesan via WhatsApp 🚀</button>
             </div>
           </div>
         )}
