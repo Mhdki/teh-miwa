@@ -34,7 +34,7 @@
   scrollbar-width: none;
 }
 
-/* --- BARU: SPLASH SCREEN ANIMATION --- */
+/* SPLASH SCREEN ANIMATION */
 .splash-bounce {
   animation: splashBounce 2s infinite;
 }
@@ -53,14 +53,23 @@
   100% { width: 100%; }
 }
 
-/* Efek Layar Terbuka (Curtain Effect) */
-.splash-exit {
-  animation: slideUpFade 0.8s ease-in-out forwards;
+.splash-exit-wrapper {
+  animation: splashFadeOut 0.5s ease-in-out 2.5s forwards; /* Hilang setelah 2.5d */
 }
 
-@keyframes slideUpFade {
-  to {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
+@keyframes splashFadeOut {
+  to { opacity: 0; pointer-events: none; }
+}
+
+/* --- ANIMASI MARQUEE (TEKS BERJALAN) --- */
+.animate-marquee {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee 15s linear infinite;
+  padding-left: 100%; /* Mulai dari luar layar kanan */
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
 }
