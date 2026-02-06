@@ -11,38 +11,40 @@ const menus = [
 const categories = ["Semua", "Original", "Milk Series", "Fruit Series"];
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true); // State buat Splash Screen
   const [activeCat, setActiveCat] = useState("Semua");
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [cart, setCart] = useState(() => {
-    const saved = localStorage.getItem("miwaCart");
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [name, setName] = useState("");
+  
+  // Efek buat matiin Splash Screen setelah 3 detik
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
-  useEffect(() => { setIsLoaded(true); }, []);
-  useEffect(() => { localStorage.setItem("miwaCart", JSON.stringify(cart)); }, [cart]);
-
-  const totalQty = cart.reduce((acc, item) => acc + item.qty, 0);
-  const totalPrice = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-
-  const addToCart = (menu) => {
-    setCart(prev => {
-      const existing = prev.find(i => i.id === menu.id);
-      if (existing) return prev.map(i => i.id === menu.id ? { ...i, qty: i.qty + 1 } : i);
-      return [...prev, { ...menu, qty: 1 }];
-    });
-  };
-
-  const removeFromCart = (id) => {
-    setCart(prev => prev.map(i => i.id === id ? { ...i, qty: i.qty - 1 } : i).filter(i => i.qty > 0));
-  };
-
-  const clearCart = () => { if(window.confirm("Kosongkan keranjang?")) { setCart([]); setIsCheckoutOpen(false); } };
-
-  const filteredMenus = useMemo(() => activeCat === "Semua" ? menus : menus.filter(m => m.category === activeCat), [activeCat]);
+  // ... (kode cart dan logic lainnya tetep sama) ...
 
   return (
+    <div className="app-shell">
+      {/* SPLASH SCREEN ANIMATION */}
+      {showSplash && (
+        <div className="splash-screen">
+          <div className="splash-content">
+            <span className="splash-logo">🍃</span>
+            <h1 className="splash-title">Teh Miwa</h1>
+            <p className="splash-tagline">Segernya Masa Kini!</p>
+            <div className="loading-bar"></div>
+          </div>
+        </div>
+      )}
+
+      {/* KONTEN UTAMA (Cuma muncul/render kalau splash beres atau barengan tapi ketutup) */}
+      <div className={`main-layout ${!showSplash ? 'show' : ''}`}>
+         {/* ... Isi Navbar, Hero, Menu, dll yang tadi ... */}
+      </div>
+    </div>
+  );
+}
     <div className={`app-shell ${isLoaded ? 'fade-in' : ''}`}>
       {/* NAVBAR */}
       <nav className="navbar">
