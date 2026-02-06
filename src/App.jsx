@@ -9,27 +9,18 @@ const menus = [
   { id: 5, name: "Leci Tea", price: 12000, category: "Fruit Series", img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300", desc: "Ada buah leci aslinya di dalam!" },
 ];
 
-const quotes = [
-  "Hidup itu kayak teh, pahit manisnya gimana lu nyeduhnya.",
-  "Haus itu manusiawi, tapi beli Miwa itu solusi hakiki.",
-  "Kerja terus kapan minumnya? Rehat sejenak bareng Miwa.",
-  "Jangan lupa bersyukur, hari ini lu masih bisa minum enak."
-];
-
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [activeCat, setActiveCat] = useState("Semua");
   const [cart, setCart] = useState([]);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [name, setName] = useState("");
+  const [pickupTime, setPickupTime] = useState(""); // Fitur Jam Jemput
   const [note, setNote] = useState("");
-  const [quoteIndex, setQuoteIndex] = useState(0);
 
   useEffect(() => {
     localStorage.removeItem("miwaCart");
-    setTimeout(() => setShowSplash(false), 2500);
-    const interval = setInterval(() => setQuoteIndex(p => (p + 1) % quotes.length), 5000);
-    return () => clearInterval(interval);
+    setTimeout(() => setShowSplash(false), 2800);
   }, []);
 
   const addToCart = (m) => {
@@ -45,19 +36,19 @@ export default function App() {
   };
 
   const totalPrice = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-  const totalQty = cart.reduce((acc, item) => acc + item.qty, 0);
 
   const sendOrder = () => {
-    if (!name) return alert("Pake nama siapa nih, cukk? 🙏");
+    if (!name || !pickupTime) return alert("Nama dan Jam Jemput wajib diisi ya, cukk! 🙏");
     
-    const listOrder = cart.map((i, idx) => `${idx + 1}. *${i.name}* (${i.qty}x) - Rp${(i.price * i.qty).toLocaleString()}`).join('%0A');
+    const listOrder = cart.map((i, idx) => `${idx + 1}. *${i.name}* (${i.qty}x)`).join('%0A');
     
-    const message = `Halo Teh Miwa! 👋%0A%0ASaya mau pesan lewat Web nih:%0A` +
-      `👤 *Nama:* ${name}%0A%0A` +
-      `🛒 *Pesanan:*%0A${listOrder}%0A%0A` +
+    const message = `Halo Teh Miwa! 👋%0A%0ASaya mau pesan lewat Web:%0A%0A` +
+      `👤 *Nama:* ${name}%0A` +
+      `⏰ *Jam Jemput:* ${pickupTime}%0A%0A` +
+      `🛒 *Daftar Pesanan:*%0A${listOrder}%0A%0A` +
       `📝 *Catatan (Es/Gula):*%0A${note || "-"}%0A%0A` +
       `💰 *Total Bayar: Rp${totalPrice.toLocaleString()}*%0A%0A` +
-      `*#PesanDuluJemputLaluBayar* 🚀%0A_Ditunggu tehnya ya!_`;
+      `*Penting:* Saya akan bayar saat tiba di booth. Pesanan mohon dikerjakan pas saya sampai ya biar tetap segar! 🚀`;
 
     window.open(`https://wa.me/628123456789?text=${message}`, "_blank");
   };
@@ -65,101 +56,103 @@ export default function App() {
   const filtered = useMemo(() => activeCat === "Semua" ? menus : menus.filter(m => m.category === activeCat), [activeCat]);
 
   return (
-    <div className="app-container">
+    <div className="app-shell">
       {showSplash && (
-        <div className="splash">
-          <div className="splash-box">
-            <span className="splash-icon">🍃</span>
-            <h1>Teh Miwa</h1>
-            <div className="loader"></div>
+        <div className="splash-ui">
+          <div className="splash-circle">
+            <span className="leaf-icon">🍃</span>
           </div>
+          <h1 className="logo-anim">TEH MIWA</h1>
+          <p>Segernya Masa Kini</p>
         </div>
       )}
 
-      <div className={`main-content ${!showSplash ? "fade-in" : ""}`}>
-        <nav className="top-nav">
-          <div className="brand">🍃 <span>Teh Miwa</span></div>
-          <div className="status">BOOTH OPEN</div>
+      <div className={`main-ui ${!showSplash ? "show" : ""}`}>
+        <nav className="glass-nav">
+          <div className="nav-brand">🍃 <span>MIWA</span></div>
+          <div className="nav-status"><span>●</span> BOOTH OPEN</div>
         </nav>
 
-        <header className="hero-section">
-          <p className="hero-tag">#PesanDuluJemputLaluBayar</p>
-          <h1>Haus? Jangan Antri,<br/><span className="highlight">Langsung Sruput!</span></h1>
-          <div className="booth-badge">📍 Booth: Jl. Raya Miwa No. 1</div>
+        <header className="pro-hero">
+          <div className="hero-pill">Pesan Dulu • Jemput • Bayar</div>
+          <h2>Gak Perlu Antri,<br/><span className="gradient-text">Langsung Sruput!</span></h2>
+          <div className="notice-box">
+            📌 Pesanan baru dikerjakan saat kamu tiba di booth biar es gak cair!
+          </div>
         </header>
 
-        <div className="category-bar">
+        <div className="filter-scroll">
           {["Semua", "Original", "Milk Series", "Fruit Series"].map(c => (
             <button key={c} onClick={() => setActiveCat(c)} className={activeCat === c ? "active" : ""}>{c}</button>
           ))}
         </div>
 
-        <div className="menu-container">
+        <div className="menu-grid">
           {filtered.map((m, idx) => (
-            <div key={m.id} className="menu-card" style={{animationDelay: `${idx * 0.1}s`}}>
-              <div className="img-wrapper"><img src={m.img} alt="" /></div>
-              <div className="card-detail">
-                <h3>{m.name}</h3>
-                <p>{m.desc}</p>
-                <div className="price-row">
+            <div key={m.id} className="menu-card-pro" style={{animationDelay: `${idx * 0.05}s`}}>
+              <div className="img-box"><img src={m.img} alt="" /></div>
+              <div className="info-box">
+                <div className="info-top">
+                  <h3>{m.name}</h3>
+                  <p>{m.desc}</p>
+                </div>
+                <div className="info-bottom">
                   <strong>Rp{m.price.toLocaleString()}</strong>
-                  <button onClick={() => addToCart(m)} className="add-btn">+</button>
+                  <button onClick={() => addToCart(m)} className="add-vibe">+</button>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        <footer className="main-footer">
-          <div className="quote-box">
-            <p key={quoteIndex} className="quote-anim">"{quotes[quoteIndex]}"</p>
-          </div>
-          <p className="copyright">© 2026 Teh Miwa • Segernya Masa Kini</p>
-        </footer>
-
-        {cart.length > 0 && !isCheckoutOpen && (
-          <div className="floating-cart" onClick={() => setIsCheckoutOpen(true)}>
-            <div className="cart-left">
-              <span className="count">{totalQty} Menu</span>
-              <span className="price">Rp{totalPrice.toLocaleString()}</span>
+        {cart.length > 0 && (
+          <div className="checkout-bar" onClick={() => setIsCheckoutOpen(true)}>
+            <div className="bar-info">
+              <span className="bar-qty">{cart.reduce((a, b) => a + b.qty, 0)} Item</span>
+              <span className="bar-total">Rp{totalPrice.toLocaleString()}</span>
             </div>
-            <span className="cta">Cek Out &rarr;</span>
+            <div className="bar-action">Siap Jemput? &rarr;</div>
           </div>
         )}
 
         {isCheckoutOpen && (
-          <div className="modal-bg">
-            <div className="modal-sheet">
-              <div className="sheet-header">
-                <h3>Pesanan Lu</h3>
-                <button onClick={() => setIsCheckoutOpen(false)} className="close-x">✕</button>
+          <div className="modal-ui">
+            <div className="sheet-ui">
+              <div className="sheet-head">
+                <h3>Detail Pesanan</h3>
+                <button onClick={() => setIsCheckoutOpen(false)}>✕</button>
               </div>
               
-              <div className="cart-list">
+              <div className="sheet-scroll">
                 {cart.map(i => (
-                  <div key={i.id} className="cart-item">
-                    <div className="item-meta">
+                  <div key={i.id} className="row-item">
+                    <div className="row-info">
                       <h4>{i.name}</h4>
-                      <span>Rp{(i.price * i.qty).toLocaleString()}</span>
+                      <p>Rp{(i.price * i.qty).toLocaleString()}</p>
                     </div>
-                    <div className="item-qty">
+                    <div className="row-qty">
                       <button onClick={() => removeFromCart(i.id)}>−</button>
                       <span>{i.qty}</span>
                       <button onClick={() => addToCart(i)}>+</button>
                     </div>
                   </div>
                 ))}
+
+                <div className="form-ui">
+                  <label>Nama Kamu</label>
+                  <input type="text" placeholder="Masukkan nama..." value={name} onChange={e => setName(e.target.value)} />
+                  
+                  <label>Estimasi Jam Jemput</label>
+                  <input type="time" value={pickupTime} onChange={e => setPickupTime(e.target.value)} />
+                  
+                  <label>Catatan (Gula/Es)</label>
+                  <textarea placeholder="Contoh: Es sedikit, Gula pisah..." value={note} onChange={e => setNote(e.target.value)} />
+                </div>
               </div>
 
-              <div className="checkout-form">
-                <p className="note-alert">⚠️ Bayar di booth pas jemput tehnya ya!</p>
-                <input type="text" placeholder="Nama Lu Siapa?" value={name} onChange={e => setName(e.target.value)} />
-                <textarea 
-                  placeholder="Catatan (Contoh: Es dikit, Gula normal)" 
-                  value={note} 
-                  onChange={e => setNote(e.target.value)}
-                />
-                <button className="order-btn" onClick={sendOrder}>Kirim ke WhatsApp 🚀</button>
+              <div className="sheet-footer">
+                <p>💡 Bayar tunai/QRIS saat tiba di booth</p>
+                <button className="btn-finish" onClick={sendOrder}>Pesan & Jemput 🚀</button>
               </div>
             </div>
           </div>
