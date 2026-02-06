@@ -43,7 +43,7 @@ export default function App() {
     if (!name) return alert("Isi nama dulu cukk! 🙏");
     const details = cart.map((i, index) => `${index + 1}. *${i.name}* (${i.qty}x)`).join('%0A');
     const msg = `Halo Teh Miwa!%0A%0A👤 *Nama:* ${name}%0A🛒 *Pesanan:*%0A${details}%0A%0A💰 *Total: Rp${totalPrice.toLocaleString()}*%0A%0ADitunggu ya!`;
-    window.open(`https://wa.me/628123456789?text=${msg}`);
+    window.open(`https://wa.me/6282287686071?text=${msg}`);
   };
 
   const filteredMenus = useMemo(() => activeCat === "Semua" ? menus : menus.filter(m => m.category === activeCat), [activeCat]);
