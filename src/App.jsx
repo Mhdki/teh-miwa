@@ -98,7 +98,7 @@ function App() {
     });
     message += `%0A💰 *Total: Rp ${totalAmount.toLocaleString('id-ID')}*%0A`;
     message += `%0A#pesandulujemputlalubayar`;
-    window.open(`https://wa.me/6281234567890?text=${message}`, '_blank');
+    window.open(`https://wa.me/6282287686071?text=${message}`, '_blank');
   };
 
   // --- TAMPILAN SPLASH SCREEN ---
