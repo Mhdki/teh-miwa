@@ -1,25 +1,32 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Miwa - Pesan Dulu Jemput Nanti</title>
     
-    <title>Teh Miwa - Segernya Bikin Happy!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     
-    <meta name="description" content="Haus? Pesan Teh Miwa sekarang! Banyak varian rasa, harga mulai 5rb. Bayar di booth, gak pake ribet." />
-
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://tehmiwa.com/" />
-    <meta property="og:title" content="Teh Miwa - Order Dulu, Ambil di Booth! 🥤" />
-    <meta property="og:description" content="Lagi haus? Cek menu Teh Miwa di sini. Tinggal klik, pesan, langsung sruput!" />
-    <meta property="og:image" content="https://images.unsplash.com/photo-1556679343-c7306c1976bc?q=80&w=1000&auto=format&fit=crop" />
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Poppins', 'sans-serif'] },
+            colors: {
+               amber: { 500: '#F59E0B', 600: '#D97706' }, // Warna Teh
+               emerald: { 600: '#059669' } // Warna WA
+            }
+          }
+        }
+      }
+    </script>
   </head>
-  <body>
+  <body class="bg-gray-50 text-gray-800">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
