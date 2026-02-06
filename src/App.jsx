@@ -1,22 +1,93 @@
 import React, { useState, useEffect } from 'react';
 import './index.css';
 
-// --- DATA PRODUK (LENGKAP) ---
+// --- DATA PRODUK (UPDATE: Tambah isAvailable) ---
 const MENU_ITEMS = [
   // Original
-  { id: 1, name: 'Teh Original Merah', category: 'Original', price: 5000, desc: 'Sepat wangi asli, manisnya pas.', image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=300&q=80', isBestSeller: true },
-  { id: 2, name: 'Teh Original Merah (Kecil)', category: 'Original', price: 3000, desc: 'Versi mini, kesegaran sama.', image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=300&q=80', isBestSeller: false },
-  { id: 3, name: 'Teh Original Hijau', category: 'Original', price: 5000, desc: 'Aroma melati khas yang menenangkan.', image: 'https://images.unsplash.com/photo-1627435601361-ec25412569dd?auto=format&fit=crop&w=300&q=80', isBestSeller: false },
-  // ITEM BARU: Hijau Kecil
-  { id: 4, name: 'Teh Original Hijau (Kecil)', category: 'Original', price: 3000, desc: 'Versi mini, aroma melati khas.', image: 'https://images.unsplash.com/photo-1627435601361-ec25412569dd?auto=format&fit=crop&w=300&q=80', isBestSeller: false },
+  { 
+    id: 1, 
+    name: 'Teh Original Merah', 
+    category: 'Original', 
+    price: 5000, 
+    desc: 'Sepat wangi asli, manisnya pas.', 
+    image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=300&q=80', 
+    isBestSeller: true,
+    isAvailable: true // <--- TRUE = ADA
+  },
+  { 
+    id: 2, 
+    name: 'Teh Original Merah (Kecil)', 
+    category: 'Original', 
+    price: 3000, 
+    desc: 'Versi mini, kesegaran sama.', 
+    image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=300&q=80', 
+    isBestSeller: false,
+    isAvailable: true 
+  },
+  { 
+    id: 3, 
+    name: 'Teh Original Hijau', 
+    category: 'Original', 
+    price: 5000, 
+    desc: 'Aroma melati khas yang menenangkan.', 
+    image: 'https://images.unsplash.com/photo-1627435601361-ec25412569dd?auto=format&fit=crop&w=300&q=80', 
+    isBestSeller: false,
+    isAvailable: true 
+  },
+  { 
+    id: 4, 
+    name: 'Teh Original Hijau (Kecil)', 
+    category: 'Original', 
+    price: 3000, 
+    desc: 'Versi mini, aroma melati khas.', 
+    image: 'https://images.unsplash.com/photo-1627435601361-ec25412569dd?auto=format&fit=crop&w=300&q=80', 
+    isBestSeller: false,
+    isAvailable: true 
+  },
   
   // Varian Rasa
-  { id: 5, name: 'Miwa Lemon Tea', category: 'Varian Rasa', price: 7000, desc: 'Perpaduan teh dan lemon segar.', image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=300&q=80', isBestSeller: true },
-  { id: 6, name: 'Miwa Lychee Tea', category: 'Varian Rasa', price: 7000, desc: 'Ada sensasi leci yang bikin mood naik.', image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=300&q=80', isBestSeller: false },
+  { 
+    id: 5, 
+    name: 'Miwa Lemon Tea', 
+    category: 'Varian Rasa', 
+    price: 7000, 
+    desc: 'Perpaduan teh dan lemon segar.', 
+    image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=300&q=80', 
+    isBestSeller: true,
+    isAvailable: true 
+  },
+  { 
+    id: 6, 
+    name: 'Miwa Lychee Tea', 
+    category: 'Varian Rasa', 
+    price: 7000, 
+    desc: 'Maaf ya kak, Leci lagi kosong :( .', // Ubah deskripsi biar sopan
+    image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=300&q=80', 
+    isBestSeller: false,
+    isAvailable: false // <--- CONTOH FALSE (HABIS)
+  },
   
   // Thai Tea
-  { id: 7, name: 'Thai Tea Original', category: 'Thai Tea', price: 8000, desc: 'Creamy, legit, autentik Thailand.', image: 'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?auto=format&fit=crop&w=300&q=80', isBestSeller: true },
-  { id: 8, name: 'Thai Tea (Kecil)', category: 'Thai Tea', price: 5000, desc: 'Versi hemat buat yang pengen creamy.', image: 'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?auto=format&fit=crop&w=300&q=80', isBestSeller: false },
+  { 
+    id: 7, 
+    name: 'Thai Tea Original', 
+    category: 'Thai Tea', 
+    price: 8000, 
+    desc: 'Creamy, legit, autentik Thailand.', 
+    image: 'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?auto=format&fit=crop&w=300&q=80', 
+    isBestSeller: true,
+    isAvailable: true 
+  },
+  { 
+    id: 8, 
+    name: 'Thai Tea (Kecil)', 
+    category: 'Thai Tea', 
+    price: 5000, 
+    desc: 'Versi hemat buat yang pengen creamy.', 
+    image: 'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?auto=format&fit=crop&w=300&q=80', 
+    isBestSeller: false,
+    isAvailable: true 
+  },
 ];
 
 const TESTIMONIALS = [
@@ -47,6 +118,9 @@ function App() {
   useEffect(() => { const interval = setInterval(() => { setQuoteIndex((prev) => (prev + 1) % QUOTES.length); }, 4000); return () => clearInterval(interval); }, []);
 
   const addToCart = (product) => {
+    // CEK STOK DULU
+    if (!product.isAvailable) return; // Jika false, fungsi berhenti (gak bisa diklik)
+
     const existingItem = cart.find((item) => item.id === product.id);
     if (existingItem) { setCart(cart.map((item) => item.id === product.id ? { ...item, qty: item.qty + 1 } : item)); } 
     else { setCart([...cart, { ...product, qty: 1 }]); }
@@ -95,7 +169,6 @@ function App() {
       
       {/* Navbar Fixed */}
       <nav className="fixed top-0 w-full z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all">
-        {/* FITUR PROMO BERJALAN */}
         <div className="bg-emerald-500 text-white text-[10px] py-1 overflow-hidden relative">
           <div className="animate-marquee font-medium">
             🔥 PROMO: Jumat Berkah Beli 2 Gratis 1 Cup Kecil! • Buka Senin - Sabtu (10.00 - 18.00) • Pesan Dulu Jemput Nanti, Biar Es Gak Cair! ⚡
@@ -140,19 +213,45 @@ function App() {
         <div className="space-y-4 mb-12">
           {filteredMenu.map((item) => {
             const itemQty = getItemQty(item.id);
+            // Logic Cek Stok
+            const isSoldOut = !item.isAvailable;
+
             return (
-              <div key={item.id} className={`group bg-white p-3 rounded-2xl border transition-all duration-300 flex items-center gap-4 hover:shadow-lg relative overflow-hidden ${itemQty > 0 ? 'border-amber-400 ring-1 ring-amber-400 bg-amber-50/30' : 'border-gray-100 shadow-sm'}`}>
-                {item.isBestSeller && ( <div className="absolute top-0 right-0"><div className="bg-red-500 text-white text-[8px] font-bold px-3 py-1 rounded-bl-xl shadow-sm z-10">BEST SELLER 🔥</div></div> )}
+              <div key={item.id} className={`group bg-white p-3 rounded-2xl border transition-all duration-300 flex items-center gap-4 hover:shadow-lg relative overflow-hidden ${itemQty > 0 ? 'border-amber-400 ring-1 ring-amber-400 bg-amber-50/30' : 'border-gray-100 shadow-sm'} ${isSoldOut ? 'opacity-70 grayscale' : ''}`}>
+                
+                {/* Badge Best Seller */}
+                {item.isBestSeller && !isSoldOut && ( <div className="absolute top-0 right-0"><div className="bg-red-500 text-white text-[8px] font-bold px-3 py-1 rounded-bl-xl shadow-sm z-10">BEST SELLER 🔥</div></div> )}
+                
+                {/* Badge HABIS */}
+                {isSoldOut && ( <div className="absolute top-0 right-0"><div className="bg-gray-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl shadow-sm z-10">HABIS / SOLD OUT</div></div> )}
+
                 <div className="w-24 h-24 shrink-0 bg-gray-100 rounded-xl overflow-hidden relative">
                   <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                   {itemQty > 0 && <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[2px] animate-fade-in"><span className="text-white font-extrabold text-2xl drop-shadow-md">{itemQty}x</span></div>}
                 </div>
+                
                 <div className="flex-1">
                   <h3 className="font-bold text-gray-800 text-sm leading-tight pr-4">{item.name}</h3>
                   <p className="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed">{item.desc}</p>
                   <div className="flex justify-between items-end mt-3">
                     <p className="text-amber-500 font-bold text-base">Rp {item.price.toLocaleString('id-ID')}</p>
-                    <button onClick={() => addToCart(item)} className={`w-9 h-9 rounded-full flex items-center justify-center active-bounce transition-colors ${itemQty > 0 ? 'bg-emerald-500 text-white shadow-emerald-200 shadow-md' : 'bg-amber-100 text-amber-600 hover:bg-amber-500 hover:text-white'}`}><span className="font-bold text-xl">{itemQty > 0 ? '✎' : '+'}</span></button>
+                    
+                    {/* LOGIC TOMBOL HABIS */}
+                    <button 
+                      onClick={() => addToCart(item)} 
+                      disabled={isSoldOut}
+                      className={`h-9 px-3 rounded-full flex items-center justify-center transition-colors ${
+                        isSoldOut 
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed' // Style kalau Habis
+                        : (itemQty > 0 ? 'bg-emerald-500 text-white shadow-emerald-200 shadow-md active-bounce' : 'bg-amber-100 text-amber-600 hover:bg-amber-500 hover:text-white active-bounce w-9')
+                      }`}
+                    >
+                      {isSoldOut ? (
+                        <span className="text-[10px] font-bold">Habis</span>
+                      ) : (
+                        <span className="font-bold text-xl">{itemQty > 0 ? '✎' : '+'}</span>
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -189,7 +288,7 @@ function App() {
         <p className="text-[10px] text-gray-400">&copy; {new Date().getFullYear()} The Miwa. Refresh Your Day.</p>
       </footer>
 
-      {/* Cart Modal */}
+      {/* Cart Modal & Warning Modal (Sama seperti sebelumnya) */}
       {isCartOpen && (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setIsCartOpen(false)}></div>
